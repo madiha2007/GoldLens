@@ -2,15 +2,19 @@
 before Madiha's pipeline and Patil's signals are ready.
 The 'signal' part below is only a stand-in for Patil's real output.
 The numbers are fake: never show results from this data as real findings."""
-import os
+from pathlib import Path
 from itertools import combinations
 import duckdb, numpy as np, pandas as pd
 
-DB = "goldlens.duckdb"
-if os.path.exists(DB):
-    os.remove(DB)
-con = duckdb.connect(DB)
-for stmt in open("schema.sql").read().split(";"):
+HERE = Path(__file__).resolve().parent      # .../backend/backtest
+REPO = HERE.parents[1]                       # repo root (parent of backend/)
+SCHEMA = REPO / "database" / "schema.sql"
+DB = HERE / "goldlens.duckdb"                # created next to this script
+
+if DB.exists():
+    DB.unlink()
+con = duckdb.connect(str(DB))
+for stmt in SCHEMA.read_text(encoding="utf-8").split(";"):
     if stmt.strip():
         con.execute(stmt)
 
