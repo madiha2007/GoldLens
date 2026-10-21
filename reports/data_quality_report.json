@@ -1,0 +1,20 @@
+{
+  "source_file": "BhavCopyDateWise_20102026.xls",
+  "rows_read": 16216,
+  "target_futures_rows_before_date_validation": 30,
+  "clean_rows": 30,
+  "invalid_date_rows": 0,
+  "zero_volume_rows": 3,
+  "missing_contract_symbols": [],
+  "symbols_found": [
+    "GOLD",
+    "GOLDGUINEA",
+    "GOLDM",
+    "GOLDPETAL",
+    "GOLDTEN"
+  ],
+  "duplicate_key_rows": 0,
+  "volume_unit": "lots",
+  "open_interest_unit": "lots",
+  "date_validation_note": "Trade date parsed from source; requested-date validation will be added when processing a specified date."
+}
