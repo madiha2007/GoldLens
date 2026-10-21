@@ -1,0 +1,12 @@
+run_id,1
+period,2025-01-01 to 2026-06-30
+trades,11
+hit_rate_net,0.091
+gross_pnl,-106.86
+total_costs,1078.3
+net_pnl,-1185.17
+gold_exposure_pnl,0.0
+strategy_pnl_ex_gold,-1185.17
+avg_net_pnl_per_trade,-107.74
+max_drawdown,-1185.17
+gold_change_pct_same_period,-1.08
