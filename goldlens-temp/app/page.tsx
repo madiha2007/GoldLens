@@ -1,69 +1,91 @@
-import Image from "next/image";
+import { BarList, Callout, EmptyState, FuturesTable, Panel, SummaryCard, type BarItem } from "../components/ui";
+import { loadGoldLensData } from "../lib/data";
+import { fmtDate, fmtNum, latestTradeDate, nearestContract, orderedSymbols } from "../lib/utils";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function OverviewPage() {
+  const { contracts, contractsError, invalidCsvRows } = await loadGoldLensData();
+  const latest = latestTradeDate(contracts);
+
+  if (!latest) {
+    return (
+      <EmptyState title="No gold futures data found">
+        {contractsError ?? "The CSV was read, but it contains no valid rows."} Run the data pipeline to generate
+        data/processed/gold_futures.csv, then refresh.
+      </EmptyState>
+    );
+  }
+
+  const rows = contracts.filter((r) => r.tradeDate === latest);
+  const tradeDates = new Set(contracts.map((r) => r.tradeDate)).size;
+  const symbols = orderedSymbols(rows);
+  const totalVolume = rows.reduce((s, r) => s + r.volume, 0);
+  const zeroVolume = rows.filter((r) => r.volume === 0).length;
+  const active = rows.filter((r) => r.expiryDate >= latest).length;
+
+  const priceItems: BarItem[] = [];
+  const volumeItems: BarItem[] = [];
+  for (const s of symbols) {
+    const symRows = rows.filter((r) => r.symbol === s);
+    const near = nearestContract(symRows, latest);
+    if (near && near.close !== null) {
+      priceItems.push({
+        label: s,
+        value: near.close,
+        display: fmtNum(near.close),
+        note: `exp ${fmtDate(near.expiryDate)}`,
+      });
+    }
+    const vol = symRows.reduce((sum, r) => sum + r.volume, 0);
+    volumeItems.push({ label: s, value: vol, display: fmtNum(vol) });
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="stack">
+      {tradeDates === 1 ? (
+        <Callout>
+          Only one trading date ({fmtDate(latest)}) is loaded, so everything below is a snapshot of that day. No
+          historical trend has been established yet.
+        </Callout>
+      ) : null}
+      {invalidCsvRows > 0 ? (
+        <Callout tone="warn">{invalidCsvRows} CSV row(s) had an invalid symbol or date and were ignored.</Callout>
+      ) : null}
+
+      <div className="cards">
+        <SummaryCard label="Latest Trading Date" value={fmtDate(latest)} hint={`${tradeDates} trading date${tradeDates === 1 ? "" : "s"} loaded`} gold />
+        <SummaryCard label="Gold Contracts Available" value={String(rows.length)} hint={`${symbols.length} unique symbols; each expiry is one contract`} />
+        <SummaryCard label="Total Trading Volume" value={fmtNum(totalVolume)} hint={`lots, all symbols, latest date. ${zeroVolume} contract${zeroVolume === 1 ? "" : "s"} with zero volume`} />
+        <SummaryCard label="Active Expiry Contracts" value={String(active)} hint="expiry on or after the latest trading date" />
+      </div>
+
+      <Panel title="Gold futures comparison" subtitle={`Contracts recorded on ${fmtDate(latest)}. Click a column header to sort.`}>
+        <FuturesTable rows={rows} />
+      </Panel>
+
+      <div className="chart-grid">
+        <Panel title="Closing price by symbol" subtitle="Nearest-expiry contract for each symbol">
+          {priceItems.length > 0 ? (
+            <>
+              <BarList items={priceItems} />
+              <p className="note">
+                Symbols are quoted in different contract sizes, so these prices are not directly comparable. Size
+                normalisation comes later.
+              </p>
+            </>
+          ) : (
+            <EmptyState title="No closing prices available" />
+          )}
+        </Panel>
+        <Panel title="Trading volume by symbol" subtitle="Total lots across all expiries, latest date">
+          {totalVolume > 0 ? (
+            <BarList items={volumeItems} accent="teal" />
+          ) : (
+            <EmptyState title="No volume recorded">Every contract has zero volume on the latest trading date.</EmptyState>
+          )}
+        </Panel>
+      </div>
     </div>
   );
 }
