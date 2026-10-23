@@ -1,11 +1,8 @@
 {
-  "source_file": "BhavCopyDateWise_20102026.xls",
-  "rows_read": 16216,
-  "target_futures_rows_before_date_validation": 30,
-  "clean_rows": 30,
-  "invalid_date_rows": 0,
-  "zero_volume_rows": 3,
-  "missing_contract_symbols": [],
+  "files_discovered": 4,
+  "files_processed": 4,
+  "files_skipped": 0,
+  "clean_rows": 118,
   "symbols_found": [
     "GOLD",
     "GOLDGUINEA",
@@ -13,8 +10,99 @@
     "GOLDPETAL",
     "GOLDTEN"
   ],
-  "duplicate_key_rows": 0,
+  "missing_contract_symbols": [],
+  "zero_volume_rows": 11,
+  "duplicate_key_rows_removed": 0,
   "volume_unit": "lots",
   "open_interest_unit": "lots",
-  "date_validation_note": "Trade date parsed from source; requested-date validation will be added when processing a specified date."
+  "missing_price_values_by_column": {
+    "open": 11,
+    "high": 11,
+    "low": 11,
+    "close": 0
+  },
+  "rows_with_missing_prices": 11,
+  "zero_volume_rows_with_missing_prices": 11,
+  "files": [
+    {
+      "file": "BhavCopyDateWise_14102026.xls",
+      "status": "processed",
+      "reason": "",
+      "rows_kept": 29,
+      "requested_date": "14/10/2026",
+      "returned_date": "14/10/2026",
+      "source_rows": 15440,
+      "target_futures_rows": 29,
+      "invalid_expiry_rows": 0,
+      "zero_volume_rows": 2,
+      "missing_price_values": {
+        "open": 2,
+        "high": 2,
+        "low": 2,
+        "close": 0
+      },
+      "rows_with_missing_prices": 2,
+      "zero_volume_rows_with_missing_prices": 2
+    },
+    {
+      "file": "BhavCopyDateWise_15102026.xls",
+      "status": "processed",
+      "reason": "",
+      "rows_kept": 29,
+      "requested_date": "15/10/2026",
+      "returned_date": "15/10/2026",
+      "source_rows": 15935,
+      "target_futures_rows": 29,
+      "invalid_expiry_rows": 0,
+      "zero_volume_rows": 2,
+      "missing_price_values": {
+        "open": 2,
+        "high": 2,
+        "low": 2,
+        "close": 0
+      },
+      "rows_with_missing_prices": 2,
+      "zero_volume_rows_with_missing_prices": 2
+    },
+    {
+      "file": "BhavCopyDateWise_19102026.xls",
+      "status": "processed",
+      "reason": "",
+      "rows_kept": 30,
+      "requested_date": "19/10/2026",
+      "returned_date": "19/10/2026",
+      "source_rows": 15601,
+      "target_futures_rows": 30,
+      "invalid_expiry_rows": 0,
+      "zero_volume_rows": 4,
+      "missing_price_values": {
+        "open": 4,
+        "high": 4,
+        "low": 4,
+        "close": 0
+      },
+      "rows_with_missing_prices": 4,
+      "zero_volume_rows_with_missing_prices": 4
+    },
+    {
+      "file": "BhavCopyDateWise_20102026.xls",
+      "status": "processed",
+      "reason": "",
+      "rows_kept": 30,
+      "requested_date": "20/10/2026",
+      "returned_date": "20/10/2026",
+      "source_rows": 16216,
+      "target_futures_rows": 30,
+      "invalid_expiry_rows": 0,
+      "zero_volume_rows": 3,
+      "missing_price_values": {
+        "open": 3,
+        "high": 3,
+        "low": 3,
+        "close": 0
+      },
+      "rows_with_missing_prices": 3,
+      "zero_volume_rows_with_missing_prices": 3
+    }
+  ]
 }
