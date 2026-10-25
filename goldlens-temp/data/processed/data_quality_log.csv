@@ -1,0 +1,6 @@
+requested_date,returned_date,status,reason
+,,date_mismatch,MCX returned [] for requested None
+2026-10-20,,fetch_error,"MCX_URL_TEMPLATE is not set. mcxlib no longer works (MCX moved its routes). Copy the request URL from the browser DevTools into .env, or use --from-file."
+2026-10-21,2026-10-21,ok,
+2026-10-22,2026-10-22,ok,
+2026-10-23,2026-10-23,ok,

@@ -1,3 +1,7 @@
 duckdb
 pandas
 numpy
+mcxlib
+openpyxl
+psycopg2-binary
+python-dotenv
