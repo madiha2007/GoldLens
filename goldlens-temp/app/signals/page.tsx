@@ -2,7 +2,7 @@ import { Callout, EmptyState, Panel, SummaryCard, StatusPill } from "../../compo
 
 export const dynamic = "force-dynamic";
 
-const SIGNAL_API = process.env.SIGNAL_API_URL || "http://localhost:8787";
+const SIGNAL_API = process.env.SIGNAL_API_URL || "http://127.0.0.1:8787";
 
 type Signal = {
   trade_date: string;
@@ -48,11 +48,15 @@ async function fetchJSON<T>(endpoint: string): Promise<T | null> {
   try {
     const res = await fetch(`${SIGNAL_API}${endpoint}`, {
       cache: "no-store",
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(15000),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error(`fetchJSON non-ok ${endpoint}: ${res.status}`);
+      return null;
+    }
     return (await res.json()) as T;
-  } catch {
+  } catch (err) {
+    console.error(`fetchJSON failed for ${endpoint}:`, err);
     return null;
   }
 }

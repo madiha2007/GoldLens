@@ -55,19 +55,21 @@ class _Encoder(json.JSONEncoder):
 
 
 def _to_records(df: pd.DataFrame) -> list[dict]:
-    """Convert DataFrame to list of dicts with JSON-safe types."""
+    """Convert DataFrame to list of dicts with JSON-safe types (no bare NaNs)."""
     records = []
     for _, row in df.iterrows():
         rec = {}
         for col in df.columns:
             val = row[col]
-            if isinstance(val, (pd.Timestamp,)):
+            if pd.isna(val):
+                rec[col] = None
+            elif isinstance(val, (pd.Timestamp,)):
                 rec[col] = val.isoformat()[:10]
-            elif isinstance(val, (np.integer,)):
+            elif isinstance(val, (np.integer, int)):
                 rec[col] = int(val)
-            elif isinstance(val, (np.floating,)):
+            elif isinstance(val, (np.floating, float)):
                 rec[col] = float(val) if np.isfinite(val) else None
-            elif isinstance(val, (np.bool_,)):
+            elif isinstance(val, (np.bool_, bool)):
                 rec[col] = bool(val)
             elif hasattr(val, 'isoformat'):
                 rec[col] = str(val)
