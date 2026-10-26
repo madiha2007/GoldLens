@@ -7,7 +7,7 @@ import { fmtDate, fmtNum, type Contract, type Tone } from "../lib/utils";
 
 /* ============================ Icons ============================ */
 
-function Icon({ name }: { name: "grid" | "bars" | "bell" | "calendar" | "database" }) {
+function Icon({ name }: { name: "grid" | "bars" | "bell" | "calendar" | "database" | "signal" }) {
   const paths: Record<string, ReactNode> = {
     grid: (
       <>
@@ -15,6 +15,17 @@ function Icon({ name }: { name: "grid" | "bars" | "bell" | "calendar" | "databas
         <rect x="14" y="3" width="7" height="7" />
         <rect x="3" y="14" width="7" height="7" />
         <rect x="14" y="14" width="7" height="7" />
+      </>
+    ),
+    signal: (
+      <>
+        <path d="M2 20h20" />
+        <path d="M5 20v-6" />
+        <path d="M9 20v-9" />
+        <path d="M13 20v-4" />
+        <path d="M17 20v-12" />
+        <path d="M21 20v-7" />
+        <circle cx="17" cy="5" r="2" />
       </>
     ),
     bars: (
@@ -67,6 +78,7 @@ function Icon({ name }: { name: "grid" | "bars" | "bell" | "calendar" | "databas
 
 const NAV = [
   { href: "/", label: "Overview", icon: "grid" },
+  { href: "/signals", label: "Signals", icon: "signal" },
   { href: "/contracts", label: "Contract Analysis", icon: "bars" },
   { href: "/alerts", label: "Alerts", icon: "bell" },
   { href: "/expiry", label: "Expiry Calendar", icon: "calendar" },
@@ -109,6 +121,7 @@ export function Sidebar() {
 
 const PAGES: Record<string, { title: string; desc: string }> = {
   "/": { title: "Overview", desc: "Latest MCX gold futures records from the daily Bhavcopy." },
+  "/signals": { title: "Signals", desc: "Normalized spreads, z-scores, liquidity flags and alerts from the signal engine." },
   "/contracts": { title: "Contract Analysis", desc: "Explore contracts, expiries and prices by symbol." },
   "/alerts": { title: "Alerts", desc: "Simple, rule-based checks on the latest available data." },
   "/expiry": { title: "Expiry Calendar", desc: "Contract expiry dates found in the current dataset." },
