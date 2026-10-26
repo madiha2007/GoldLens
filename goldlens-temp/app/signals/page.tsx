@@ -1,3 +1,4 @@
+import React from "react";
 import { Callout, EmptyState, Panel, SummaryCard, StatusPill } from "../../components/ui";
 
 export const dynamic = "force-dynamic";
