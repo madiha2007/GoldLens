@@ -1,8 +1,7 @@
+duckdb
 pandas
 numpy
-scipy
-streamlit
-plotly
-duckdb
-pyarrow
-pytest
+mcxlib
+openpyxl
+psycopg2-binary
+python-dotenv
