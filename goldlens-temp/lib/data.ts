@@ -1,9 +1,6 @@
 // SERVER-ONLY data layer.
-// Reads exactly two fixed files from the GoldLens project root. There is no API route and
-// no user-supplied path, so nothing else on disk can be reached from the browser.
-//
-// The project root is assumed to be the parent of the Next.js app folder (goldlens-temp).
-// If you ever run Next from somewhere else, set GOLDLENS_ROOT to the GoldLens folder path.
+// Reads the CSV and the quality report from a URL (Vercel Blob) when GOLD_DATA_URL /
+// REPORT_DATA_URL are set, and falls back to local files for development on your PC.
 
 import { promises as fs } from "fs";
 import path from "path";
@@ -16,6 +13,9 @@ const ROOT = process.env.GOLDLENS_ROOT
 
 const CSV_PATH = path.join(ROOT, "data", "processed", "gold_futures.csv");
 const REPORT_PATH = path.join(ROOT, "reports", "data_quality_report.json");
+
+const CSV_URL = process.env.GOLD_DATA_URL;
+const REPORT_URL = process.env.REPORT_DATA_URL;
 
 const REQUIRED = [
   "symbol",
@@ -31,14 +31,26 @@ const REQUIRED = [
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 
-async function readText(p: string): Promise<{ text: string | null; error: string | null }> {
+type TextResult = { text: string | null; error: string | null };
+
+// Reads from a URL if one is given, otherwise from a local file path.
+async function readText(localPath: string, url?: string): Promise<TextResult> {
+  if (url) {
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) return { text: null, error: `Could not download data (HTTP ${res.status})` };
+      return { text: await res.text(), error: null };
+    } catch {
+      return { text: null, error: "Could not download data from the configured URL" };
+    }
+  }
   try {
-    return { text: await fs.readFile(p, "utf8"), error: null };
+    return { text: await fs.readFile(localPath, "utf8"), error: null };
   } catch (e) {
     const code = (e as NodeJS.ErrnoException).code;
     return {
       text: null,
-      error: code === "ENOENT" ? `File not found: ${p}` : `Could not read file: ${p}`,
+      error: code === "ENOENT" ? `File not found: ${localPath}` : `Could not read file: ${localPath}`,
     };
   }
 }
@@ -114,7 +126,10 @@ export type GoldLensData = {
 
 // cache() means the layout and the page share one read per request.
 export const loadGoldLensData = cache(async (): Promise<GoldLensData> => {
-  const [csv, json] = await Promise.all([readText(CSV_PATH), readText(REPORT_PATH)]);
+  const [csv, json] = await Promise.all([
+    readText(CSV_PATH, CSV_URL),
+    readText(REPORT_PATH, REPORT_URL),
+  ]);
 
   let contracts: Contract[] = [];
   let invalidCsvRows = 0;
@@ -132,7 +147,7 @@ export const loadGoldLensData = cache(async (): Promise<GoldLensData> => {
     try {
       report = JSON.parse(json.text) as QualityReport;
     } catch {
-      reportError = `Report is not valid JSON: ${REPORT_PATH}`;
+      reportError = "Report is not valid JSON";
     }
   }
 
