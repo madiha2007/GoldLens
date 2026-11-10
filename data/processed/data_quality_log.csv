@@ -476,3 +476,5 @@ requested_date,returned_date,status,reason
 2026-10-27,2026-10-27,ok,
 2026-10-28,2026-10-28,ok,
 2026-10-29,,no_data,"MCX returned no rows (holiday, weekend or not published yet)"
+2026-11-09,2026-11-09,ok,
+2026-11-10,,no_data,"MCX returned no rows (holiday, weekend or not published yet)"
